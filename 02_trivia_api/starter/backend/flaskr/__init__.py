@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, abort, jsonify
+from flask import Flask, Response, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
@@ -14,9 +14,13 @@ def create_app(test_config=None):
   setup_db(app)
   CORS(app,resources={r"/api/*":{"origins":"*"}})
 
-  '''
-  @TODO: Use the after_request decorator to set Access-Control-Allow
-  '''
+  @app.after_request
+  def after_request(response):
+    response.headers.add('Access-Control-Allow-Headers','Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods','GET, POST, PATCH,DELETE,OPTIONS')
+  
+
+ 
 
   '''
   @TODO: 
