@@ -84,15 +84,34 @@ def create_app(test_config=None):
   def retrieve_questions_by_search_term():
     body = request.get_json()
     term = body.get("search_term",None)
-    questions = Question.query.filter(Question.question.contains(f'{term}')).all()#to search for the term anywhere it is a substring in the column
-    filtered_questions = [quizz.question for quizz in questions]
+    if term == None:
+      question   = body.get('question',None) 
+      answer     = body.get('answer',None)
+      difficulty = body.get('difficulty',None)
+      category   = body.get('category',None)
 
-    return jsonify({
-      'success':True,
-      'questions': filtered_questions,
-      'total_questions':len(filtered_questions),
-      'current_category':questions[0].category
-    })
+      new_question = Question(question=question,answer=answer,difficulty=difficulty,category=category)
+      
+      try:
+        new_question.insert()
+
+      except:
+        new_question.turn_back()
+      
+      return jsonify({
+        'success':True,
+        'message':'Question successfully posted' 
+      })
+    else:
+      questions = Question.query.filter(Question.question.contains(f'{term}')).all()#to search for the term anywhere it is a substring in the column
+      filtered_questions = [quizz.question for quizz in questions]
+
+      return jsonify({
+        'success':True,
+        'questions': filtered_questions,
+        'total_questions':len(filtered_questions),
+        'current_category':questions[0].category
+      })
 
   @app.route('/categories/<int:id>/questions')
   def get_questions_by_category(id):
