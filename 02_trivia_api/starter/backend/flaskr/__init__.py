@@ -39,9 +39,10 @@ def create_app(test_config=None):
   @app.route('/categories')
   def all_categories():
     categories = Category.query.all()
+    filtered_categories = [group.type for group in categories]
 
     return jsonify({
-      "categories":categories
+      "categories":filtered_categories
     })
 
 
