@@ -1,4 +1,6 @@
+import json
 import os
+from unicodedata import category
 from flask import Flask, Response, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -65,7 +67,6 @@ def create_app(test_config=None):
       category_name = Category.query.get_or_404(int(char)).type
       if filtered_categories.count(category_name) <= 1:
         filtered_categories.append(category_name)
-      
      
     if len(paginated)==0:
       abort(404)
@@ -77,7 +78,20 @@ def create_app(test_config=None):
         'categories':filtered_categories ,
       })
   
-        
+  @app.route('/questions',methods=['POST'])
+  def retrieve_questions_by_search_term():
+    body = request.get_json()
+    term = body.get("search_term",None)
+    print(term)
+    questions = Question.query.filter(Question.question.contains(f'{term}')).all()
+    filtered_questions = [quizz.question for quizz in questions]
+
+    return jsonify({
+      'success':True,
+      'questions': filtered_questions,
+      'total_questions':len(filtered_questions),
+      'current_category':questions[0].category
+    })
 
   @app.route('/categories/<int:id>/questions')
   def get_questions_by_category(id):
