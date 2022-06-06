@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
 
-from models import setup_db, Question, Category
+from models import setup_db, Question, Category,db 
 
 QUESTIONS_PER_PAGE = 10
 
@@ -70,6 +70,19 @@ def create_app(test_config=None):
         'current_category':'',
         'categories':''
       })
+
+  @app.route('/categories/<int:id>/questions')
+  def get_questions_by_category(id):
+    '''This would return the questions having the particular category id '''
+    #category = Category.query.filter_by(id=id)
+    Quizz = Question.query.filter_by(category=id)
+    selected = [questions.question for questions in Quizz]
+
+    return jsonify({
+      'questions':selected,
+      'total_questions':len(selected),
+      'current_category':id
+    })
 
   '''
   @TODO: 
