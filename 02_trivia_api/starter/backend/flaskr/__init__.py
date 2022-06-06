@@ -82,8 +82,7 @@ def create_app(test_config=None):
   def retrieve_questions_by_search_term():
     body = request.get_json()
     term = body.get("search_term",None)
-    print(term)
-    questions = Question.query.filter(Question.question.contains(f'{term}')).all()
+    questions = Question.query.filter(Question.question.contains(f'{term}')).all()#to search for the term anywhere it is a substring in the column
     filtered_questions = [quizz.question for quizz in questions]
 
     return jsonify({
@@ -104,6 +103,20 @@ def create_app(test_config=None):
       'questions':selected,
       'total_questions':len(selected),
       'current_category':id
+    })
+
+  @app.route('/questions/<int:id>',methods = ['DELETE'])
+  def delete_question(id):
+    question = Question.query.filter_by(id=id).one_or_none()   
+    try:
+      question.delete()
+    except:
+      if question == None:
+        abort(400)
+    return jsonify({
+      'success':True,
+      'deleted_question':question.id,
+      'question':question.question           
     })
 
   '''
