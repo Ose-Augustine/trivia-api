@@ -41,6 +41,9 @@ def create_app(test_config=None):
     categories = Category.query.all()
     filtered_categories = [group.type for group in categories]
 
+    if len(filtered_categories)==0:
+      abort(500)
+
     return jsonify({
       "categories":filtered_categories
     })
@@ -105,6 +108,8 @@ def create_app(test_config=None):
     else:
       questions = Question.query.filter(Question.question.contains(f'{term}')).all()#to search for the term anywhere it is a substring in the column
       filtered_questions = [quizz.question for quizz in questions]
+      if len(filtered_questions)==0:
+        abort(404)
 
       return jsonify({
         'success':True,
@@ -116,9 +121,11 @@ def create_app(test_config=None):
   @app.route('/categories/<int:id>/questions')
   def get_questions_by_category(id):
     '''This would return the questions having the particular category id '''
-    #category = Category.query.filter_by(id=id)
     Quizz = Question.query.filter_by(category=id)
     selected = [questions.question for questions in Quizz]
+
+    if len(selected)==0:
+      abort(404)
 
     return jsonify({
       'questions':selected,
@@ -133,13 +140,36 @@ def create_app(test_config=None):
       question.delete()
     except:
       if question == None:
-        abort(400)
+        abort(404)
     return jsonify({
       'success':True,
       'deleted_question':question.id,
       'question':question.question           
     })
 
+  @app.errorhandler(404)
+  def not_found():
+    return jsonify({
+      'success':False,
+      'error':404,
+      'message':"Resource not found"
+    })
+
+  @app.errorhandler(422)
+  def uprocessed():
+    return jsonify({
+      'success':False,
+      'error':422,
+      'message':"Could not be processed"
+    })
+
+  @app.errorhandler(500)
+  def server_error():
+    return jsonify({
+      'success':False,
+      'error': 500,
+      'message':"Server did not load this request"
+    })
   '''
   @TODO: 
   Create an endpoint to DELETE question using a question ID. 
