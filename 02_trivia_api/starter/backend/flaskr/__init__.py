@@ -56,20 +56,28 @@ def create_app(test_config=None):
   '''
   @app.route('/questions')
   def retrieve_questions():
-    selection= Question.query.all()
-    question_pages = paginate_questions(request,selection)
-
-    if len(question_pages) == 0:
-      abort(404)  
-
+    question = Question.query.all()
+    paginated = paginate_questions(request,question)
+    questions = [quizz['question'] for quizz in paginated]
+    categories = [quizz['category'] for quizz in paginated]
+    filtered_categories = []
+    for char in categories:
+      category_name = Category.query.get_or_404(int(char)).type
+      if filtered_categories.count(category_name) <= 1:
+        filtered_categories.append(category_name)
+      
+     
+    if len(paginated)==0:
+      abort(404)
+    
     else:
       return jsonify({
-
-        'questions':question_pages,
-        'number_of_total_questions': len(selection),
-        'current_category':'',
-        'categories':''
+        'questions': questions,
+        'total_questions':len(questions),
+        'categories':filtered_categories ,
       })
+  
+        
 
   @app.route('/categories/<int:id>/questions')
   def get_questions_by_category(id):
