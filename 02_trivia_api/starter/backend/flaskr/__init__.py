@@ -38,7 +38,7 @@ def create_app(test_config=None):
   @app.after_request
   def after_request(response):
     response.headers.add('Access-Control-Allow-Headers','Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods','GET, POST, PATCH,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Methods','GET, POST,DELETE,OPTIONS')
     return response
   
 
@@ -84,43 +84,40 @@ def create_app(test_config=None):
     else:
       return jsonify({
         'questions': paginated,
-        'total_questions':len(paginated),
+        'totalQuestions':len(paginated),
         'categories':filtered_categories ,
       })
   
   @app.route('/questions',methods=['POST'])
   def retrieve_questions_by_search_term():
     body = request.get_json()
-    term = body.get("search_term",None)
+    term = body.get("searchTerm",None)
     if term == None:
       question   = body.get('question',None) 
       answer     = body.get('answer',None)
       difficulty = body.get('difficulty',None)
       category   = body.get('category',None)
 
-      new_question = Question(question=question,answer=answer,difficulty=difficulty,category=category)
+      new_question = Question(question=question,answer=answer,difficulty=int(difficulty),category=int(category))
       
       try:
         new_question.insert()
 
       except:
         new_question.turn_back()
-      
-      return jsonify({
-        'success':True,
-        'message':'Question successfully posted' 
-      })
+
+      return "Success"
     else:
       questions = Question.query.filter(Question.question.contains(f'{term}')).all()#to search for the term anywhere it is a substring in the column
-      filtered_questions = [quizz.question for quizz in questions]
+      filtered_questions = [quizz.format() for quizz in questions]
+
       if len(filtered_questions)==0:
         abort(404)
 
       return jsonify({
-        'success':True,
         'questions': filtered_questions,
-        'total_questions':len(filtered_questions),
-        'current_category':questions[0].category
+        'totalQuestions':len(filtered_questions),
+        'currentCategory':questions[0].category
       })
 
   @app.route('/categories/<int:id>/questions')
@@ -136,8 +133,8 @@ def create_app(test_config=None):
 
     return jsonify({
       'questions':selected,
-      'total_questions':len(all_questions),
-      'current_category':category.type
+      'totalQuestions':len(selected),
+      'currentCategory':category.type
     })
 
   @app.route('/questions/<int:id>',methods = ['DELETE'])
@@ -148,14 +145,16 @@ def create_app(test_config=None):
     except:
       if question == None:
         abort(404)
-    return jsonify({
-      'success':True,
-      'deleted_question':question.id,
-      'question':question.question           
-    })
+
+  @app.route('/quizzes',methods=['POST']) 
+  def return_quizzes():
+    
+    pass
+
+
 
   @app.errorhandler(404)
-  def not_found():
+  def not_found(error):
     return jsonify({
       'success':False,
       'error':404,
@@ -163,7 +162,7 @@ def create_app(test_config=None):
     })
 
   @app.errorhandler(422)
-  def uprocessed():
+  def uprocessed(error):
     return jsonify({
       'success':False,
       'error':422,
@@ -171,7 +170,7 @@ def create_app(test_config=None):
     })
 
   @app.errorhandler(500)
-  def server_error():
+  def server_error(error):
     return jsonify({
       'success':False,
       'error': 500,

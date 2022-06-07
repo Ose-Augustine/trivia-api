@@ -34,10 +34,18 @@ class TriviaTestCase(unittest.TestCase):
     """
 
     def test_get_all_categories(self):
-        res = self.client().get("/categories")
+        res  = self.client().get("/categories")
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code,200)
+        self.assertTrue(data["categories"])
+
+    def test_405_for_categories(self):
+        res = self.client().patch("/categories")
+
+        self.assertEqual(res.status_code,405)
+
+
 
 
 
