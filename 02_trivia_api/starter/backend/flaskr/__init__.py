@@ -127,15 +127,17 @@ def create_app(test_config=None):
   def get_questions_by_category(id):
     '''This would return the questions having the particular category id '''
     Quizz = Question.query.filter_by(category=id)
-    selected = [questions.question for questions in Quizz]
+    all_questions = Question.query.all()
+    selected = [info.format() for info in Quizz]
+    category = Category.query.get(id)
 
     if len(selected)==0:
       abort(404)
 
     return jsonify({
       'questions':selected,
-      'total_questions':len(selected),
-      'current_category':id
+      'total_questions':len(all_questions),
+      'current_category':category.type
     })
 
   @app.route('/questions/<int:id>',methods = ['DELETE'])
