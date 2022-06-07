@@ -87,6 +87,27 @@ class TriviaTestCase(unittest.TestCase):
             "difficulty":3
             })
         self.assertEqual(res.status_code,200)
+    
+    def test_get_questions_by_categories(self):
+        res  = self.client().get("/categories/1/questions")
+        data = json.loads(res.data) 
+
+        self.assertEqual(res.status_code,200)
+        self.assertTrue(data["questions"])
+        self.assertTrue(data["totalQuestions"])
+        self.assertTrue(data["currentCategory"])
+    
+    def test_non_existing_category_for_questions(self):
+        res  = self.client().get("/categories/100/questions")
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code,404)
+        self.assertTrue(data["message"],"Resource not found")
+
+    def test_unsupported_method_for_questions_by_categories(self):
+        res = self.client().delete("/categories/1/questions")
+
+        self.assertEqual(res.status_code,405)
 
 
 
