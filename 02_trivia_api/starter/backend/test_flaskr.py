@@ -51,6 +51,20 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code,404)
 
+    def test_get_all_paginated_questions(self):
+        res = self.client().get("/questions")
+        data = json.loads(res.data) 
+
+        self.assertEqual(res.status_code,200)
+        self.assertTrue(data["questions"])
+        self.assertTrue(data["totalQuestions"])
+        self.assertTrue(data["categories"])
+
+    def test_405_for_questions(self):
+        res = self.client().delete("/questions") 
+
+        self.assertEqual(res.status_code,405)
+
 
 
 

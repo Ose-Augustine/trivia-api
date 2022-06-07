@@ -167,7 +167,7 @@ def create_app(test_config=None):
       'success':False,
       'error':422,
       'message':"Could not be processed"
-    })
+    }),422
 
   @app.errorhandler(500)
   def server_error(error):
@@ -175,7 +175,15 @@ def create_app(test_config=None):
       'success':False,
       'error': 500,
       'message':"Server did not load this request"
-    })
+    }),500
+
+  @app.errorhandler(405)
+  def unsupported_method(error):
+    return jsonify({
+      'success':False,
+      'error':405,
+      'message':"Method not allowed for this route"
+    }),405
   '''
   @TODO: 
   Create an endpoint to DELETE question using a question ID. 
