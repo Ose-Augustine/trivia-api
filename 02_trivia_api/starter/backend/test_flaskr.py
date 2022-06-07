@@ -65,6 +65,29 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code,405)
 
+    def test_get_search_term_match_on_questions(self):
+        res  = self.client().post("/questions", json={"searchTerm":"young"})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code,200)
+        self.assertTrue(data["questions"])
+        self.assertTrue(data["totalQuestions"])
+        self.assertTrue(data["currentCategory"])
+    
+    def test_search_term_no_result_on_questions(self):
+        res = self.client().post("/questions", json={"searchTerm":"fulani"})
+        
+        self.assertEqual(res.status_code,404)
+
+    def test_insert_new_questions(self):
+        res = self.client().post("/questions", json={
+            "question":"Who is the Oscar's named after",
+            "answer":"Oscar Wilde",
+            "category":2,
+            "difficulty":3
+            })
+        self.assertEqual(res.status_code,200)
+
 
 
 
