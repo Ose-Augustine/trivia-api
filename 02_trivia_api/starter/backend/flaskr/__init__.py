@@ -18,6 +18,17 @@ def paginate_questions(request,selection):
   current_questions = questions[start:end]
   return current_questions 
 
+def return_all_categories():
+  categories          = Category.query.all()
+  ids                 = [group.id for group in categories]
+  filtered_categories = [group.type for group in categories]
+  result              = zip(ids,filtered_categories)#jointly iterate over the two lists 
+  package             = {}
+  for id,type in result:
+    package[f'{id}'] = f'{type}'
+  
+  return package 
+
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
@@ -38,20 +49,13 @@ def create_app(test_config=None):
   '''
   @app.route('/categories')
   def all_categories():
-    categories          = Category.query.all()
-    ids                 = [group.id for group in categories]
-    filtered_categories = [group.type for group in categories]
-    result              = zip(ids,filtered_categories)#jointly iterate over the two lists 
-    package             = {}
-    for id,type in result:
-      package[f'{id}'] = f'{type}'
-
+    filtered_categories = return_all_categories()
 
     if len(filtered_categories)==0:
       abort(500)
 
     return jsonify({
-      "categories":package 
+      "categories":filtered_categories
     })
 
 
@@ -71,21 +75,16 @@ def create_app(test_config=None):
   def retrieve_questions():
     question = Question.query.all()
     paginated = paginate_questions(request,question)
-    questions = [quizz['question'] for quizz in paginated]
-    categories = [quizz['category'] for quizz in paginated]
-    filtered_categories = []
-    for char in categories:
-      category_name = Category.query.get_or_404(int(char)).type
-      if filtered_categories.count(category_name) <= 1:
-        filtered_categories.append(category_name)
+    filtered_categories = return_all_categories()
+    
      
     if len(paginated)==0:
       abort(404)
     
     else:
       return jsonify({
-        'questions': questions,
-        'total_questions':len(questions),
+        'questions': paginated,
+        'total_questions':len(paginated),
         'categories':filtered_categories ,
       })
   
