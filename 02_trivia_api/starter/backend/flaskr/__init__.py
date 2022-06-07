@@ -38,14 +38,20 @@ def create_app(test_config=None):
   '''
   @app.route('/categories')
   def all_categories():
-    categories = Category.query.all()
+    categories          = Category.query.all()
+    ids                 = [group.id for group in categories]
     filtered_categories = [group.type for group in categories]
+    result              = zip(ids,filtered_categories)#jointly iterate over the two lists 
+    package             = {}
+    for id,type in result:
+      package[f'{id}'] = f'{type}'
+
 
     if len(filtered_categories)==0:
       abort(500)
 
     return jsonify({
-      "categories":filtered_categories
+      "categories":package 
     })
 
 
