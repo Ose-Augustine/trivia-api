@@ -159,7 +159,7 @@ def create_app(test_config=None):
       'success':False,
       'error':404,
       'message':"Resource not found"
-    })
+    }),404
 
   @app.errorhandler(422)
   def uprocessed(error):

@@ -45,6 +45,12 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code,405)
 
+    def test_404_for_categories(self):
+        res = self.client().get("/categories/1")
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code,404)
+
 
 
 
