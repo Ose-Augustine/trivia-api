@@ -108,6 +108,16 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().delete("/categories/1/questions")
 
         self.assertEqual(res.status_code,405)
+    
+    def test_delete_questions_successful(self):
+        res = self.client().delete("/questions/12")
+
+        self.assertEqual(res.status_code,200)
+
+    def test_delete_question_not_existing(self):
+        res = self.client().delete("/questions/1000")
+
+        self.assertEqual(res.status_code,404)
 
 
 

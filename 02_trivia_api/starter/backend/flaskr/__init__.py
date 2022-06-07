@@ -142,9 +142,11 @@ def create_app(test_config=None):
     question = Question.query.filter_by(id=id).one_or_none()   
     try:
       question.delete()
+      return ""
     except:
       if question == None:
         abort(404)
+  
 
   @app.route('/quizzes',methods=['POST']) 
   def return_quizzes():
