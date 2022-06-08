@@ -149,11 +149,11 @@ def create_app(test_config=None):
         previous_questions = body.get('previous_questions', None)
         current_category   = body.get('quiz_category',None)
         # returns all the objects of questions whose id's are not in the
-        # [previous_questions]
+        # [previous_questions] and are in the same category of quiz_category
         category = Category.query.filter_by(type=f'{current_category}').first()
         all_questions = Question.query.filter(
             ~Question.id.in_(previous_questions), Question.category==category.id ).all()
-
+        #random.choice returns a random object in all_questions
         return jsonify({
             'question':random.choice(all_questions).format()
         })
