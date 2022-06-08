@@ -7,7 +7,7 @@ database_name = "trivia"
 user          = os.environ.get('DB_TRIVIA_USER')
 password      = os.environ.get('DB_TRIVIA_PASS')
 
-database_path = "postgresql://{}:{}@{}/{}".format(user,password,'localhost:5432', database_name)
+database_path = "postgresql://{}:{}@{}/{}".format('localhost:5432', database_name)
 
 db = SQLAlchemy()
 

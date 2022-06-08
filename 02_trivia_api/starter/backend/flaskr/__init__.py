@@ -144,13 +144,16 @@ def create_app(test_config=None):
     def return_quizzes():
         body = request.get_json()
         previous_questions = body.get('previous_questions', None)
+        current_category   = body.get('quiz_category',None)
         # returns all the objects of questions whose id's are not in the
         # [previous_questions]
+        category = Category.query.filter_by(type=f'{current_category}').first()
         all_questions = Question.query.filter(
-            ~Question.id.in_(previous_questions)).all()
+            ~Question.id.in_(previous_questions), Question.category==category.id ).all()
 
         return jsonify({
-            'question': all_questions[0].format()
+            'category':category.type,
+            'question':random.choice(all_questions).format()
         })
 
     @app.errorhandler(404)
