@@ -133,9 +133,12 @@ def create_app(test_config=None):
     @app.route('/questions/<int:id>', methods=['DELETE'])
     def delete_question(id):
         question = Question.query.filter_by(id=id).one_or_none()
+        id = question.id
         try:
             question.delete()
-            return ""
+            return jsonify({
+                "id":id
+            })
         except BaseException:
             if question is None:
                 abort(404)
@@ -152,7 +155,6 @@ def create_app(test_config=None):
             ~Question.id.in_(previous_questions), Question.category==category.id ).all()
 
         return jsonify({
-            'category':category.type,
             'question':random.choice(all_questions).format()
         })
 
